@@ -1,11 +1,8 @@
 """
 SparkRetail - synthetic dataset generator
-
-Produces three CSVs that mirror the synopsis:
-  1. sales.csv     - the main transactional fact table (deliberately skewed
-                     towards one region, per Module 2's "data skew" study)
-  2. customers.csv - small dimension table, joined in Module 2
-  3. regions.csv   - tiny lookup table, used for the BROADCAST join in Module 2
+  1. sales.csv     
+  2. customers.csv 
+  3. regions.csv  
 
 Run: python generate_data.py
 """
@@ -23,8 +20,6 @@ os.makedirs(OUT_DIR, exist_ok=True)
 # ---- Dimension data -------------------------------------------------
 
 REGIONS = ["North", "South", "East", "West", "Central"]
-# Deliberate skew: 'North' gets ~65% of all transactions so Module 2 has a
-# real data-skew problem to demonstrate (and fix with broadcast join + salting).
 REGION_WEIGHTS = [0.65, 0.10, 0.10, 0.08, 0.07]
 
 STORES = {
@@ -51,7 +46,7 @@ PRODUCTS = [
 PAYMENT_METHODS = ["UPI", "Credit Card", "Debit Card", "Cash", "Net Banking"]
 
 N_CUSTOMERS = 2000
-N_TRANSACTIONS = 300_000  # large enough to make Spark's distributed advantage visible
+N_TRANSACTIONS = 300_000  
 
 # ---- regions.csv (tiny lookup -> broadcast join target) --------------
 
