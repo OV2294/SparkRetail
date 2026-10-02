@@ -61,7 +61,7 @@ Standalone cluster: start a master/worker, then `SPARK_MASTER=spark://host:7077 
 **Windows note:** writing CSV/Parquet in Module 3 requires Hadoop's `winutils.exe` + `hadoop.dll` (set `HADOOP_HOME`).
 I could only test on Linux.
 
-## What each module shows — and results from my run
+## What each module shows 
 **Module 1 — RDDs.** Lazy evaluation (defining the pipeline takes 0.5 s, the first action 9 s, a cached re-count 0.7 s),
 narrow vs wide transformations, `reduceByKey` 0.88 s vs `groupByKey` 1.08 s (1.2x, identical output), lineage via
 `toDebugString()`, Job/Stage/Task counts, and fault tolerance: partition 2 is made to fail twice, Spark retries from lineage
@@ -84,16 +84,3 @@ Query B: same windows × country, no watermark, **memory sink** queried with SQL
 3% of events are delivered 4 hours late: Query B equals the batch truth to the penny; Query A drops 298 of the 303 delayed
 lines (£5,240) because their windows were already finalised. With `--late-fraction 0`, Query A equals the batch truth exactly.
 Window size is configurable (`--window "1 minute"` is the synopsis example, but this shop only has ~3 lines per minute).
-
-## Honest caveats (good for the viva)
-- **Data limits.** The dataset has no separate customer table or region table. The customer dimension is *derived* from the
-  transactions (RFM), and `country_region.csv` is a small hand-built lookup of the 38 countries.
-- **`discounted_price` is a what-if.** The data contains no discounts; the project simulates a 10% bulk promotion on lines with
-  quantity ≥ 24 (see `common.py`).
-- **Gross vs net.** The #2 product by gross revenue (`PAPER CRAFT, LITTLE BIRDIE`, 80,995 units in one order) was cancelled
-  minutes later; it disappears from the net-of-cancellations ranking (`q2b`). Cancellations are not netted inside `sales`.
-- **Streaming is a replay**, not a live source; the file feed can be swapped for Kafka (`readStream.format("kafka")`).
-- **Local mode timings.** Everything runs on one machine, so gains are modest and salting even costs extra time here
-  (~2.8 s vs 1.3 s for the plain join). The evidence for skew is the partition balance and the Spark UI task-duration
-  spread, which matter on a real cluster. Timings vary by machine; the trends hold.
-- Adaptive Query Execution is switched off in `config.py` so skew effects are visible; enable it to see Spark's own skew-join handling.
